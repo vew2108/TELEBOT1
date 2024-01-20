@@ -2,9 +2,6 @@ const TOKEN = '6329965278:AAEHM8FWb9jNcQ1A70pa_JN-1Tz8Wp5eb7Y';
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 
-// Replace 'YOUR_BOT_TOKEN' with the token you get from BotFather
-// const TOKEN = 'YOUR_BOT_TOKEN';
-
 const bot = new TelegramBot(TOKEN, { polling: true });
 
 bot.onText(/\/start/, (msg) => {
@@ -17,6 +14,7 @@ bot.onText(/(\d+)/, async (msg, match) => {
     const partNumber = match[1];
 
     try {
+        // Make the API request to get part information
         const apiUrl = `https://vewtelebot.vercel.app/getpart/${partNumber}`;
         const response = await axios.get(apiUrl);
 
@@ -27,19 +25,32 @@ bot.onText(/(\d+)/, async (msg, match) => {
             if (partInfo.imageLink) {
                 // Send the information along with the image link
                 bot.sendMessage(chatId, `
-Part Information:
-SR Number: ${partInfo.srNumber}
-Part Code: ${partInfo.partCode}
-Name/Description: ${partInfo.nameDesc}
-Sample: ${partInfo.sample}
-Drawing: ${partInfo.drawing}
-Stock: ${partInfo.stock}
-Location: ${partInfo.location}
-Remark: ${partInfo.remark}
-Image Link: ${partInfo.imageLink}
+                    Part Information:
+                    SR Number: ${partInfo.srNumber}
+                    Part Code: ${partInfo.partCode}
+                    Name/Description: ${partInfo.nameDesc}
+                    Sample: ${partInfo.sample}
+                    Drawing: ${partInfo.drawing}
+                    Stock: ${partInfo.stock}
+                    Location: ${partInfo.location}
+                    Remark: ${partInfo.remark}
+                    Image Link: ${partInfo.imageLink}
                 `);
             } else {
-                bot.sendMessage(chatId, 'Image link not available.');
+                // If image link is not available, send information without the image
+                bot.sendMessage(chatId, `
+                    Part Information:
+                    SR Number: ${partInfo.srNumber}
+                    Part Code: ${partInfo.partCode}
+                    Name/Description: ${partInfo.nameDesc}
+                    Sample: ${partInfo.sample}
+                    Drawing: ${partInfo.drawing}
+                    Stock: ${partInfo.stock}
+                    Location: ${partInfo.location}
+                    Remark: ${partInfo.remark}
+                    
+                    Image Link not available.
+                `);
             }
         } else {
             bot.sendMessage(chatId, 'Failed to retrieve part information.');
@@ -50,8 +61,7 @@ Image Link: ${partInfo.imageLink}
     }
 });
 
-// Handle other message types or commands as needed
+// Additional code for handling other message types or commands as needed
 // ...
 
-// Start the bot
 console.log('Bot is running...');
